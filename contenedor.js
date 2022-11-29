@@ -1,19 +1,13 @@
 const fs = require('fs');
 
-
 class Contenedor {
-    constructor() {
-    }
-
     save(product, file) {
-
         let nextId = this.getNextId(file);
         product.id = nextId;
         const allProductsArray = this.read(file);
         allProductsArray.push(product);
 
         this.write(allProductsArray, file);
-
     }
 
     getNextId(file) {
@@ -35,6 +29,28 @@ class Contenedor {
             console.log('Error en la lectura del archivo', err);
         }
         return allProductsArray;
+    }
+
+    addNewProduct(newProduct) {
+        const products = (this.read("./products.txt"));
+        products.push(newProduct);
+        fs.writeFileSync("./products.txt", JSON.stringify(products));
+    }
+
+    updateProductById(id, productUpdated) {
+        id = Number(id);
+        const products = (this.read("./products.txt"));
+        const oldProduct = products.filter(product => product.id === id);
+        const productsUpdated = products.map(product => (product.id == id ? { ...productUpdated, id } : product));
+        fs.writeFileSync("./products.txt", JSON.stringify(productsUpdated));
+
+        return oldProduct;
+    }
+
+    deleteByIdByMe(id) {
+        const products = (this.read("./products.txt"));
+        const productsUpdated = products.filter(product => product.id != id);
+        fs.writeFileSync("./products.txt", JSON.stringify(productsUpdated));
     }
 
     async write(allProductsArray, file) {
@@ -59,6 +75,7 @@ class Contenedor {
         let allProductsArray = this.read(file);
         return allProductsArray;
     }
+
 
 
     deleteById(id, file) {
@@ -88,6 +105,8 @@ class Contenedor {
         }
     }
 
+
+
     async createFile(file_path) {
         try {
             if (fs.existsSync(file_path)) {
@@ -96,14 +115,13 @@ class Contenedor {
             } else {
                 console.log('El archivo no existe, entonces lo creo!');
                 await fs.promises.writeFile(file_path, '', 'utf8');
-                return true
+                return true;
             }
         } catch (err) {
             console.log('Error en la creación del archivo', err);
             return false;
         }
     }
-
 }
 
 

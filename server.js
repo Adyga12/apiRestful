@@ -1,52 +1,59 @@
 const http = require('http');
 const express = require('express');
-const Container = require('./contenedor')
-const servidor = express();
-const PORT = 8000;
-
-servidor.use(express.json());
+const Container = require('./contenedor');
+const server = express();
 
 
-servidor.get("/api/products", (peticion, respuesta) => {
-    const container = new Container();
-    const file = "./products.txt";
+server.set("port", process.env.PORT || 8000);
+const PORT = server.get("port");
+
+server.use(express.json());
+const container = new Container();
+const file = "./products.txt";
+
+server.get("/api/products", (req, res) => {
     const allProductsArray = container.read(file);
-    respuesta.json(allProductsArray);
+    res.json(allProductsArray);
 });
 
 
-servidor.get("/api/product/:id", (peticion, respuesta) => {
-    const { id } = peticion.params
-    const container = new Container();
-    const file = "./products.txt";
+server.get("/api/product/:id", (req, res) => {
+    const { id } = req.params
     const allProductsArray = container.read(file);
-    respuesta.json({ buscada: allProductsArray[parseInt(id) - 1] })
+    res.json({ buscada: allProductsArray[parseInt(id) - 1] })
 });
 
-servidor.post('/api/products', (peticion, respuesta) => {
-    const { nombre, cantidad, precio } = peticion.body;
-    const nuevoProducto = { nombre, cantidad, precio };
-    const products = new Container();
-    const product = products.save(nuevoProducto);
-    respuesta.json({ agregada: nuevoProducto, posicion: products.length })
-});
-
-servidor.put('/api/products/:id', (peticion, respuesta) => {
-    const { product } = peticion.body
-    const { id } = peticion.params
-    const productAnt = products[parseInt(id) - 1]
-    products[parseInt(id) - 1] = product
-    respuesta.json({ actualizada: product, anterior: productAnt })
+server.post('/api/products', (req, res) => {
+    const { nombre, cantidad, precio } = req.body;
+    const products = container.getAll("./products.txt");
+    const newProduct = { id: products.length, nombre, cantidad, precio, };
+    container.addNewProduct(newProduct);
+    res.json({ agregada: newProduct.id });
 });
 
 
-servidor.delete('/api/products/:id', (peticion, respuesta) => {
-    const { id } = peticion.params
-    const [product] = products.splice(parseInt(id) - 1, 1)
-    respuesta.json({ borrada: product })
+server.put('/api/products/:id', (req, res) => {
+    const product = req.body;
+    const { id } = req.params;
+    const oldProduct = container.updateProductById(id, product);
+    res.json({ productUpdated: product, oldProduct });
 });
 
 
+server.delete('/api/products/:id', (req, res) => {
+    const { id } = req.params
+    if (!container.getById(id, "./products.txt")) {
+        res.json({
+            error: "This id doesn't exist"
+        })
+    } else {
+        container.deleteByIdByMe(id);
+        res.json({
+            successfully: "product deleted"
+        });
+    }
+});
 
-servidor.listen(8000);
-console.log("Servidor corriendo en el puerto " + PORT);
+server.listen(PORT, () => {
+    console.log("Server running on port " + PORT + `\nVisit: http://localhost:${PORT}`);
+});
