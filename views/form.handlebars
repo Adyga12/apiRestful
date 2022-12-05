@@ -1,0 +1,12 @@
+<h1 class="text-center mt-4">Formulario de carga de productos</h1>
+<form id="productsForm" action="/" method="post" class="container mt-5 col-2">
+    <label class="col">Title</label>
+    <input name="title" type="text" required class="col" />
+    <label class="col mt-2">Price</label>
+    <input name="price" type="number" step="0.01" required class="col" />
+    <label class="col mt-2">URL Image</label>
+    <input name="thumbnail" type="url" required class="col" />
+    <input type="submit" class="btn btn-success mt-4 col" />
+    <a href="./products" class="btn btn-secondary mt-4 col">Ver listado de
+        Productos</a>
+</form>

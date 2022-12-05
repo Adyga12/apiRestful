@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "nombre": "Pulparindo",
+    "cantidad": 30,
+    "precio": 70
+  },
+  {
+    "id": 2,
+    "nombre": "Pelon Pelorico",
+    "cantidad": 15,
+    "precio": 120
+  },
+  {
+    "id": 3,
+    "nombre": "Lucas muecas",
+    "cantidad": 8,
+    "precio": 100
+  }
+]
